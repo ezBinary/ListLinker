@@ -10,7 +10,7 @@ void printList(SinglyLinkedListHandler_LinkedList<T>* myFirstNode)
     while (temp != nullptr)
     {
         std::cout << temp->data << " ";
-        temp = temp->next_link_list;
+        temp = temp->next_link;
     }
     std::cout << std::endl;
 }
