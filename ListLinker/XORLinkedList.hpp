@@ -19,15 +19,18 @@ private:
     {
         if (*start == nullptr) return;
 
-        Node* nextNode, * current = *start;
-        do 
+        Node *tempNode, *delNode, *prevNode;
+        tempNode = *start;
+        prevNode = nullptr;
+
+        while (tempNode != nullptr)
         {
-            nextNode = current->next_link;
-            delete current;
-            current = nextNode;
-        } while (current != *start);
+            delNode = tempNode;
+            tempNode = XOR(prevNode, tempNode->npXOR_list);
+            delete delNode;
+            prevNode = delNode;
+        }
         *start = nullptr;
-        firstNode = nullptr;
     }
 
 public:
@@ -76,57 +79,57 @@ public:
     }
 
     void InsertData(Node** start, T value, int position)
-{
-    if (position < 1) return;
+    {
+        if (position < 1) return;
 
-    Node* newNode = new Node;
-    newNode->data = value;
-    newNode->npXOR_list = nullptr;
+        Node* newNode = new Node;
+        newNode->data = value;
+        newNode->npXOR_list = nullptr;
 
-    if (*start == nullptr)
-    {
-        *start = newNode;
-        firstNode = newNode;
-        return;
-    }
+        if (*start == nullptr)
+        {
+            *start = newNode;
+            firstNode = newNode;
+            return;
+        }
 
-    Node* tempNode = *start;
-    Node* prevNode = nullptr;
-    Node* curNode = nullptr;
-    Node* nextNode = nullptr;
-    int currentPos = 1; 
+        Node* tempNode = *start;
+        Node* prevNode = nullptr;
+        Node* curNode = nullptr;
+        Node* nextNode = nullptr;
+        int currentPos = 1; 
 
-    while (currentPos < position && tempNode != nullptr)
-    {
-        curNode = tempNode;
-        tempNode = XOR(prevNode, curNode->npXOR_list);
-        prevNode = curNode;
-        currentPos++;
-    }
+        while (currentPos < position && tempNode != nullptr)
+        {
+            curNode = tempNode;
+            tempNode = XOR(prevNode, curNode->npXOR_list);
+            prevNode = curNode;
+            currentPos++;
+        }
 
-    if (position == 1) 
-    {
-        newNode->npXOR_list = *start;
-        (*start)->npXOR_list = XOR(newNode, XOR(nullptr, (*start)->npXOR_list));
-        *start = newNode;
-        firstNode = newNode;
+        if (position == 1) 
+        {
+            newNode->npXOR_list = *start;
+            (*start)->npXOR_list = XOR(newNode, XOR(nullptr, (*start)->npXOR_list));
+            *start = newNode;
+            firstNode = newNode;
+        }
+        else if (tempNode == nullptr && currentPos == position) // Insert at the end
+        {
+            prevNode->npXOR_list = XOR(newNode, XOR(prevNode->npXOR_list, nullptr));
+            newNode->npXOR_list = prevNode;
+        }
+        else if (currentPos == position) // Insert in the mid
+        {
+            newNode->npXOR_list = XOR(prevNode, tempNode);
+            prevNode->npXOR_list = XOR(XOR(prevNode->npXOR_list, tempNode), newNode);
+            tempNode->npXOR_list = XOR(newNode, XOR(prevNode, tempNode->npXOR_list));
+        }
+        else
+        {
+            delete newNode;
+        }
     }
-    else if (tempNode == nullptr && currentPos == position) // Insert at the end
-    {
-        prevNode->npXOR_list = XOR(newNode, XOR(prevNode->npXOR_list, nullptr));
-        newNode->npXOR_list = prevNode;
-    }
-    else if (currentPos == position) // Insert in the mid
-    {
-        newNode->npXOR_list = XOR(prevNode, tempNode);
-        prevNode->npXOR_list = XOR(XOR(prevNode->npXOR_list, tempNode), newNode);
-        tempNode->npXOR_list = XOR(newNode, XOR(prevNode, tempNode->npXOR_list));
-    }
-    else
-    {
-        delete newNode;
-    }
-}
 
 
     void PopData(Node** start)
@@ -189,6 +192,6 @@ public:
 
     ~XORLinkedListHandler()
     {
-        //deleteLinkedList(&firstNode);
+        deleteLinkedList(&firstNode);
     }
 };
